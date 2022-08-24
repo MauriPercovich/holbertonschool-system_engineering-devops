@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# 404
+
+sudo apt update
+sudo apt -y install nginx
+cd /var/www/html || exit
+sudo chmod 777 index.nginx-debian.html
+echo Hello World! > index.nginx-debian.html
+sudo sed -i '/server_name _;/a rewrite ^/redirect_me https://www.google.com/imgres?imgurl=https%3A%2F%2Fupload.wikimedia.org%2Fwikipedia%2Fcommons%2F2%2F2c%2FMaradona-Mundial_86_con_la_copa.JPG&imgrefurl=https%3A%2F%2Fes.m.wikipedia.org%2Fwiki%2FArchivo%3AMaradona-Mundial_86_con_la_copa.JPG&tbnid=jQBc_6xIFMhofM&vet=12ahUKEwiIor2Wmd75AhVcs5UCHVykBVQQMygCegUIARDNAQ..i&docid=XCWzopL8GBRkbM&w=1361&h=1995&q=maradona%20world%20cup&client=opera-gx&ved=2ahUKEwiIor2Wmd75AhVcs5UCHVykBVQQMygCegUIARDNAQ permanent;' /etc/nginx/sites-available/default
+sudo touch /var/www/html/404-page.html
+sudo chmod 777 /var/www/html/404-page.html
+sudo echo "Ceci n'est pas une page" > /var/www/html/404-page.html
+sudo sed -i '55i error_page 404 /404-page.html;' /etc/nginx/sites-enabled/default
+sudo sed -i "/listen 80 default_server/a add_header X-Served-By '$HOSTNAME';" /etc/nginx/sites-enabled/default
+sudo service nginx restart
