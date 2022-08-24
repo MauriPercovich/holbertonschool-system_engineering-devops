@@ -1,27 +1,15 @@
 #!/usr/bin/env bash
-# Scans a subdomain's record type and
-# informs which IP is pointing to that record
+# write a Bash script that will display information
 
-domain="$1"
-subdomain="$2"
-
-lookup_host() {
-    host_record=$(
-        dig "$1" | grep -A1 'ANSWER SECTION:' | tail -n 1
-    )
-
-    echo "$host_record" |
-    awk '{print "The subdomain","'"$subdomain"'","is a",$4,"record and points to",$5}'
+domains () {
+	if [ "$2" ];
+	then
+		dig $2.$1 | grep -A1 'ANSWER SECTION:' | tail -1 | awk -v var="$2" '{split($0,args," "); printf "The subdomain %s is a %s record and points to %s\n", var, args[4], args[5]}'
+	else
+		dig www."$1" | grep -A1 'ANSWER SECTION:' | tail -1 | awk '{split($0,args," "); printf ("The subdomain www is a %s record and points to %s\n"), args[4], args[5]}'
+		dig lb-01."$1" | grep -A1 'ANSWER SECTION:' | tail -1 | awk '{split($0,args," "); printf ("The subdomain lb-01 is a %s record and points to %s\n"), args[4], args[5]}'
+		dig web-01."$1" | grep -A1 'ANSWER SECTION:' | tail -1 | awk '{split($0,args," "); printf ("The subdomain web-01 is a %s record and points to %s\n"), args[4], args[5]}'
+		dig web-02."$1" | grep -A1 'ANSWER SECTION:' | tail -1 | awk '{split($0,args," "); printf ("The subdomain web-02 is a %s record and points to %s\n"), args[4], args[5]}'
+	fi
 }
-
-if [ "$domain" ] && [ "$subdomain" ] ; then
-    host="$subdomain.$domain"
-    lookup_host "$host"
-elif [ "$domain" ] ; then
-    def_subdomains=(www lb-01 web-01 web-02)
-
-    for subdomain in "${def_subdomains[@]}" ; do
-        host="$subdomain.$domain"
-        lookup_host "$host"
-    done
-fi
+domains "$1" "$2"
